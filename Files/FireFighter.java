@@ -3,13 +3,13 @@ import java.util.Arrays;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
-
+import java.util.Random;
 import java.util.ArrayList;
 
 public class FireFighter {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
+        Random rand = new Random();
         int n = scanner.nextInt(), z = 1;
         while (n != 0) {
             Map<Integer, ArrayList<Integer>> roads = new HashMap<Integer, ArrayList<Integer>>();
@@ -53,7 +53,16 @@ public class FireFighter {
                 roadsSize = find(visited, roads, n, roadsSize, roadsFor1.get(i), x);
                 visited[roadsFor1.get(i) - 1] = false;
             }
+            visited[0] = false;
             System.out.println("There are " + roadsSize + " routes from the firestation to streetcorner " + n);
+            long TC = 0;
+            for (int i = 0; i < 15; i++) {
+                int x = rand.nextInt(roadsFor1.size());
+                visited[roadsFor1.get(x) - 1] = true;
+                TC = TC + roadsFor1.size() + mountCarlo(visited, roads, n, roadsFor1.get(x), roadsFor1.size(), rand) + 1;
+                visited[roadsFor1.get(x) - 1] = false;
+            }
+            System.out.println("Time Complexity : " + (TC / 15));
             System.out.println("Enter a a new Location");
             n = scanner.nextInt();
         }
@@ -61,7 +70,7 @@ public class FireFighter {
 
     static public int find(boolean[] visited, Map<Integer, ArrayList<Integer>> roads, int n, int roadsSize, int location, String road) {
         if (location == n) {
-            System.out.print("road #" + (roadsSize + 1 )+ " : ");
+            System.out.print("road #" + (roadsSize + 1) + " : ");
             System.out.println(road);
             return roadsSize + 1;
         }
@@ -75,5 +84,29 @@ public class FireFighter {
             }
         }
         return roadsSize;
+    }
+
+    static public long mountCarlo(boolean[] visited, Map<Integer, ArrayList<Integer>> roads, int n, int location, long m, Random rand) {
+        if (location == n) {
+            return 0;
+        }
+        ArrayList<Integer> roadsForx = roads.get(location);
+        int x = rand.nextInt(roadsForx.size());
+        int q = 0;
+        while (visited[roadsForx.get(x) - 1]) {
+            x = rand.nextInt(roadsForx.size());
+            q++;
+            if (q == roadsForx.size())
+                return 0;
+        }
+        int z = 0;
+        for (int i = 0; i < roadsForx.size(); i++) {
+            if (!visited[roadsForx.get(i) - 1])
+                z++;
+        }
+        visited[roadsForx.get(x) - 1] = true;
+        long TC = (m * z) + mountCarlo(visited, roads, n, roadsForx.get(x), z * m, rand);
+        visited[roadsForx.get(x) - 1] = false;
+        return TC;
     }
 }
