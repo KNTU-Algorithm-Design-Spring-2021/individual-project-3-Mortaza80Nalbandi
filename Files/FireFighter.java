@@ -9,8 +9,8 @@ import java.util.ArrayList;
 public class FireFighter {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        boolean[] valid = new boolean[20];
-        int n = scanner.nextInt();
+
+        int n = scanner.nextInt(), z = 1;
         while (n != 0) {
             Map<Integer, ArrayList<Integer>> roads = new HashMap<Integer, ArrayList<Integer>>();
             int m1 = scanner.nextInt();
@@ -41,8 +41,39 @@ public class FireFighter {
                     m2 = scanner.nextInt();
                 }
             }
+            boolean[] visited = new boolean[20];
+            ArrayList<Integer> roadsFor1 = roads.get(1);
+            visited[0] = true;
+            int roadsSize = 0;
+            String road = "1 ";
+            System.out.println("case#" + z);
+            for (int i = 0; i < roadsFor1.size(); i++) {
+                String x = road.concat(roadsFor1.get(i) + " ");
+                visited[roadsFor1.get(i) - 1] = true;
+                roadsSize = find(visited, roads, n, roadsSize, roadsFor1.get(i), x);
+                visited[roadsFor1.get(i) - 1] = false;
+            }
+            System.out.println("There are " + roadsSize + " routes from the firestation to streetcorner " + n);
             System.out.println("Enter a a new Location");
             n = scanner.nextInt();
         }
+    }
+
+    static public int find(boolean[] visited, Map<Integer, ArrayList<Integer>> roads, int n, int roadsSize, int location, String road) {
+        if (location == n) {
+            System.out.print("road #" + (roadsSize + 1 )+ " : ");
+            System.out.println(road);
+            return roadsSize + 1;
+        }
+        ArrayList<Integer> roadsForx = roads.get(location);
+        for (int i = 0; i < roadsForx.size(); i++) {
+            if (!visited[roadsForx.get(i) - 1]) {
+                String x = road.concat(roadsForx.get(i) + " ");
+                visited[roadsForx.get(i) - 1] = true;
+                roadsSize = find(visited, roads, n, roadsSize, roadsForx.get(i), x);
+                visited[roadsForx.get(i) - 1] = false;
+            }
+        }
+        return roadsSize;
     }
 }
